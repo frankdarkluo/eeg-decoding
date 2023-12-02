@@ -2,15 +2,27 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import config
-from transformers import BertTokenizer, BertConfig
-from transformers import TFBertModel
+from transformers import BertTokenizer, RobertaTokenizer, AutoTokenizer
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.python.keras.preprocessing.sequence import pad_sequences
-from tensorflow.python.keras.preprocessing.text import Tokenizer
-from tensorflow.python.keras.callbacks import EarlyStopping, ModelCheckpoint
 import datetime
 from matplotlib import cm
-import tensorflow as tf
+
+
+def prepare_text(X_text, embedding_type):
+
+    # prepare text samples
+    print('Processing text dataset...')
+
+    print('Found %s sentences.' % len(X_text))
+
+    if embedding_type is 'bert' or embedding_type is 'roberta':
+        print(f"Prepare sequences for {embedding_type} ...")
+        max_length = get_bert_max_len(X_text)
+        X_data_text, X_data_masks = prepare_sequences_for_bert_with_mask(X_text, max_length)
+        print('Shape of data tensor:', X_data_text.shape)
+        print('Shape of data (masks) tensor:', X_data_masks.shape)
+
+        return X_data_text, X_data_masks
 
 def plot_prediction_distribution(true, pred):
     """Analyze label distribution of dataset"""
@@ -20,8 +32,7 @@ def plot_prediction_distribution(true, pred):
     plt.savefig('pred-label-distribution-' + config.class_task + '.png')
     plt.tight_layout()
     plt.clf()
-
-
+    
 def plot_label_distribution(y):
     """Analyze label distribution of dataset"""
 
@@ -95,7 +106,7 @@ def load_glove_embeddings(vocab_size, word_index, EMBEDDING_DIM):
 
     embeddings_index = {}
     with open(os.path.join(
-            '/mnt/ds3lab-scratch/noraho/embeddings/glove-6B/glove.6B.'+str(EMBEDDING_DIM)+'d.txt')) as f:
+            'glove.6B.'+str(EMBEDDING_DIM)+'d.txt')) as f:
         for line in f:
             word, coefs = line.split(maxsplit=1)
             coefs = np.fromstring(coefs, 'f', sep=' ')
@@ -121,7 +132,8 @@ def load_glove_embeddings(vocab_size, word_index, EMBEDDING_DIM):
 
 def get_bert_max_len(X):
 
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    # tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    tokenizer = RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
 
     max_len = 0
     # For every sentence...
@@ -136,8 +148,8 @@ def get_bert_max_len(X):
 
 
 def prepare_sequences_for_bert_with_mask(X, max_length):
-    
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased", do_lower_case=True)
+    tokenizer=RobertaTokenizer.from_pretrained("roberta-base", do_lower_case=True)
+    # tokenizer = BertTokenizer.from_pretrained("roberta-base", do_lower_case=True)
     # Tokenize all of the sentences and map the tokens to their word IDs.
     input_ids = []
     attention_masks = []
@@ -173,7 +185,8 @@ def prepare_sequences_for_bert_with_mask(X, max_length):
 
 
 def create_new_bert_layer():
-    bert = TFBertModel.from_pretrained("bert-base-uncased")
+    bert= TFRobertaModel.from_pretrained("roberta-base")
+    # bert = TFBertModel.from_pretrained("bert-base-uncased")
     # bert = TFBertModel.from_pretrained("/mnt/ds3lab-scratch/noraho/berts/")
 
     return bert
@@ -218,55 +231,6 @@ def plot_confusion_matrix(cm):
     plt.savefig("CM_" + config.class_task + "_" + config.feature_set[0] + ".pdf")
     plt.clf()
     # plt.show()
-
-
-def prepare_text(X_text, embedding_type, random_seed):
-
-    np.random.seed(random_seed)
-    tf.random.set_seed(random_seed)
-    os.environ['PYTHONHASHSEED'] = str(random_seed)
-
-    vocab_size = 100000
-
-    # prepare text samples
-    print('Processing text dataset...')
-
-    print('Found %s sentences.' % len(X_text))
-
-    tokenizer = Tokenizer(num_words=vocab_size)
-    tokenizer.fit_on_texts(X_text)
-    sequences = tokenizer.texts_to_sequences(X_text)
-    max_length_text = max([len(s) for s in sequences])
-    print("Maximum sentence length: ", max_length_text)
-
-    word_index = tokenizer.word_index
-    print('Found %s unique tokens.' % len(word_index))
-    num_words = min(vocab_size, len(word_index) + 1)
-
-    if embedding_type is 'none':
-        X_data_text = pad_sequences(sequences, maxlen=max_length_text, padding='post', truncating='post')
-        print('Shape of data tensor:', X_data_text.shape)
-
-        return X_data_text, num_words, ""
-
-    if embedding_type is 'glove':
-        X_data_text = pad_sequences(sequences, maxlen=max_length_text, padding='post', truncating='post')
-        print('Shape of data tensor:', X_data_text.shape)
-
-        print("Loading Glove embeddings...")
-        embedding_dim = 300
-        embedding_matrix = load_glove_embeddings(vocab_size, word_index, embedding_dim)
-
-        return X_data_text, num_words, embedding_matrix
-
-    if embedding_type is 'bert':
-        print("Prepare sequences for Bert ...")
-        max_length = get_bert_max_len(X_text)
-        X_data_text, X_data_masks = prepare_sequences_for_bert_with_mask(X_text, max_length)
-        print('Shape of data tensor:', X_data_text.shape)
-        print('Shape of data (masks) tensor:', X_data_masks.shape)
-
-        return X_data_text, num_words, X_data_masks
 
 
 def prepare_cogni_seqs(cogni_dict):

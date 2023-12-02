@@ -1,22 +1,12 @@
-from tensorflow.python.keras.preprocessing.text import hashing_trick
 import sklearn.metrics
 import os
 import numpy as np
-from tensorflow.python.keras.preprocessing.sequence import pad_sequences
-from tensorflow.python.keras.initializers import Constant
-import tensorflow.python.keras.backend as K
-from tensorflow.python.keras.layers import Input, Dense, Embedding, LSTM, Bidirectional, Flatten, Dropout, TimeDistributed
-from tensorflow.python.keras.layers.merge import concatenate
-from tensorflow.python.keras.models import Model
 import sklearn.metrics
 from sklearn.model_selection import KFold
 import ml_helpers
 import config
 import time
 from datetime import timedelta
-import tensorflow as tf
-
-os.environ['KERAS_BACKEND'] = 'tensorflow'
 
 
 # Machine learning model for sentiment classification (binary and ternary)

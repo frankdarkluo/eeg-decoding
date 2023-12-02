@@ -2,30 +2,7 @@ from datetime import date
 import numpy as np
 import config
 import h5py
-import collections
-from feature_extraction import zuco_reader
 
-def sort_dict(data_dict):
-    data_dict=collections.OrderedDict(sorted(data_dict.items()))
-    return data_dict
-
-def load_data():
-
-    feature_dict = {}
-    label_dict = {}
-    eeg_dict = {}
-    gaze_dict = {}
-    eeg_dir = config.eeg_feature_dir
-    print("TASK: ", config.class_task)
-    print("Extracting", config.feature_set[0], "features....")
-
-    for subject in config.subjects:
-        loaded_data = load_matlab_files(config.class_task, subject)
-
-        zuco_reader.extract_features(loaded_data, config.feature_set, feature_dict, eeg_dict, gaze_dict)
-        zuco_reader.extract_labels(feature_dict, label_dict, config.class_task, subject)
-
-    return eeg_dict, eeg_dir, feature_dict, label_dict
 
 def load_matlab_files(task, subject):
     """loads Matlab files depending on which files are required for the chosen classification task"""
@@ -84,14 +61,11 @@ def save_results(fold_results_dict, task):
     saves hyper-parameters and results to a result file"""
 
     if config.class_task.startswith("sentiment"):
-        base_path = 'sentiment/results'
+        result_file = open('sentiment/results/'+str(date.today()) + "_results_" + task + "_" + "-".join(config.feature_set) + "-" + config.embeddings + ".txt", 'a')
     elif config.class_task == "ner":
-        base_path = 'ner/results'
+        result_file = open('ner/results/' + str(date.today()) + "_results_" + task + "_"+ "-".join(config.feature_set) + "-" + config.embeddings +".txt", 'a')
     elif config.class_task == "reldetect":
-        base_path = 'reldetect/results'
-
-    result_file_path = f"{base_path}/{date.today()}_results_{task}_{'-'.join(config.feature_set)}-{config.embeddings}.txt"
-    result_file = open(result_file_path, 'w')
+        result_file = open('reldetect/results/' + str(date.today()) + "_results_" + task + "_" + "-".join(config.feature_set) + "-" + config.embeddings + ".txt", 'a')
 
     # print header
     #if config.model is 'cnn':
