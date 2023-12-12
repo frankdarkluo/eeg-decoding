@@ -25,7 +25,6 @@ The ZuCo 2.0 dataset is available at: https://osf.io/2urht/
    - Use `python3 tune_combi_model.py` to run other models.
 
 ## Notes
-- Ensure all necessary libraries and dependencies are installed prior to running the experiments.
 - For detailed information on parameter settings and model configurations, refer to the documentation in `config.py`.
 
 ## Contributions
