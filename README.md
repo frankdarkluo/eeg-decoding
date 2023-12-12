@@ -27,14 +27,3 @@ The ZuCo 2.0 dataset is available at: https://osf.io/2urht/
 ## Notes
 - For detailed information on parameter settings and model configurations, refer to the documentation in `config.py`.
 
-## Contributions
-Contributions to this project are welcome. Please follow the guidelines outlined in `CONTRIBUTING.md`.
-
-## License
-This project is licensed under the [LICENSE NAME] - see the `LICENSE.md` file for details.
-
-## Acknowledgments
-- Mention any collaborators, data sources, or special acknowledgments here.
-
-## Contact
-For queries or further information, please contact [Your Contact Information].
