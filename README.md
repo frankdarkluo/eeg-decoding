@@ -23,7 +23,7 @@ The ZuCo 2.0 dataset is available at: https://osf.io/2urht/
    - Adjust other parameters as needed for your specific experiment.
    - Execute `python3 tune_text_model.py` for the text-only baseline model.
    - Use `python3 tune_combi_model.py` to run other models.
-   - Use 'python3 main.py' to run our EEG decoder
+   - Use `python3 main.py` to run our EEG decoder
 
 ## Notes
 - For detailed information on parameter settings and model configurations, refer to the documentation in `config.py`.
